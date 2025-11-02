@@ -1,0 +1,4 @@
+/* public/styles.css */
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+#analyzeBtn { transition: transform .12s ease; }
+#analyzeBtn:active { transform: translateY(2px); }

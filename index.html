@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Resume Scanner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    /* Background Canvas */
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    html { scroll-behavior: smooth; }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0,255,255,0.25);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans overflow-x-hidden">
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Navbar -->
+  <nav class="bg-gray-800/60 backdrop-blur sticky top-0 z-30 border-b border-gray-700">
+    <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div class="text-cyan-400 font-semibold text-lg">AI Resume Scanner</div>
+      <div class="flex gap-6 text-sm opacity-90">
+        <a href="#home" class="hover:text-white">Home</a>
+        <a href="#features" class="hover:text-white">Features</a>
+        <a href="#scanner" class="hover:text-white">Scanner</a>
+        <a href="#contact" class="hover:text-white">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto p-6">
+
+    <!-- 🏠 HOME -->
+    <section id="home" class="text-center py-20 relative">
+      <h1 class="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-lg">
+        Smarter Hiring & Resume Insights
+      </h1>
+      <p class="mt-6 text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
+        AI Resume Scanner analyzes resumes like a real recruiter. Whether you’re a <span class="text-cyan-400 font-semibold">fresher</span> improving your resume,
+        or an <span class="text-blue-400 font-semibold">HR professional</span> shortlisting candidates, our AI engine evaluates formatting,
+        keywords, and job-fit instantly.
+      </p>
+
+      <div class="mt-10 flex justify-center gap-4">
+        <a href="#scanner" class="px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold shadow-lg hover:shadow-cyan-400/40 hover:scale-105 transition">
+          Start Scanning
+        </a>
+        <a href="#features" class="px-6 py-3 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 transition">
+          Explore Features
+        </a>
+      </div>
+
+      <div class="mt-20 grid md:grid-cols-3 gap-8">
+        <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+          <h3 class="font-semibold text-cyan-400 text-lg">AI-Powered Resume Analysis</h3>
+          <p class="mt-2 text-sm text-gray-400">Automatically detect structure, keyword density, and formatting issues using smart NLP models.</p>
+        </div>
+        <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+          <h3 class="font-semibold text-cyan-400 text-lg">Real-Time ATS Feedback</h3>
+          <p class="mt-2 text-sm text-gray-400">Instant ATS scoring and suggestions to make your resume recruiter-ready.</p>
+        </div>
+        <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+          <h3 class="font-semibold text-cyan-400 text-lg">HR Job Criteria Matching</h3>
+          <p class="mt-2 text-sm text-gray-400">HRs can input job descriptions to find resumes that best match their requirements.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ⚙️ FEATURES -->
+    <section id="features" class="grid md:grid-cols-3 gap-6 py-12">
+      <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+        <h3 class="font-semibold text-cyan-300">ATS Score for Freshers</h3>
+        <p class="mt-2 text-sm text-gray-400">Check how recruiter-friendly your resume is with AI-based scoring.</p>
+      </div>
+      <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+        <h3 class="font-semibold text-cyan-300">Keyword Optimization</h3>
+        <p class="mt-2 text-sm text-gray-400">Identify missing skills and keywords recruiters look for.</p>
+      </div>
+      <div class="feature-card bg-gray-800/40 p-6 rounded-xl border border-gray-700">
+        <h3 class="font-semibold text-cyan-300">Job Role Matching</h3>
+        <p class="mt-2 text-sm text-gray-400">HRs can match resumes against job descriptions with one click.</p>
+      </div>
+    </section>
+
+    <!-- 🔍 SCANNER -->
+    <section id="scanner" class="py-12">
+      <div class="bg-gradient-to-b from-gray-800/60 to-gray-900/80 p-8 rounded-2xl border border-gray-700 max-w-3xl mx-auto shadow-xl">
+        <h3 class="text-center text-2xl font-bold text-cyan-400">AI Resume Scanner</h3>
+
+        <div class="mt-4 flex justify-center gap-3">
+          <button id="modeFresher" class="px-4 py-2 rounded-full bg-cyan-600 text-white">Candidates ATS Score</button>
+          <button id="modeHR" class="px-4 py-2 rounded-full bg-gray-700 text-gray-200">Job Match Index</button>
+        </div>
+
+        <!-- Job Description Box (visible only in HR mode) -->
+        <div id="jobDescriptionBox" class="mt-6 hidden">
+          <label class="block text-sm text-gray-300 mb-2">Enter Job Description / Criteria</label>
+          <textarea id="jobDescription" rows="4" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 text-gray-200" placeholder="Example: Looking for React developer with 2+ years experience, SQL, and cloud knowledge..."></textarea>
+        </div>
+
+        <div class="mt-6">
+          <label class="block text-sm text-gray-300">Upload Resume (PDF or TXT)</label>
+          <div class="mt-2 flex items-center gap-4">
+            <input id="resumeFile" type="file" accept=".pdf,.txt" class="block text-gray-200" />
+            <span id="fileName" class="text-gray-400">No file chosen</span>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <button id="analyzeBtn" class="w-full px-6 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold shadow-lg hover:shadow-cyan-400/40 hover:scale-105 transition">
+            Analyze Resume
+          </button>
+        </div>
+
+        <div id="status" class="mt-4 text-center text-sm text-red-400"></div>
+
+        <div id="resultBox" class="mt-6 hidden bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+          <h4 class="font-bold">Result</h4>
+          <div id="scoreArea" class="mt-2"></div>
+          <pre id="snippetArea" class="mt-3 text-sm text-gray-300 whitespace-pre-wrap"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📬 CONTACT -->
+    <section id="contact" class="py-16 text-center text-gray-400 border-t border-gray-700">
+      <h3 class="text-xl font-semibold text-cyan-300 mb-2">Contact Us</h3>
+      <p>Email: <span class="text-cyan-400">support@airesumescanner.com</span></p>
+      <p class="mt-2">© 2025 AI Resume Scanner. All rights reserved.</p>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+
+  <script>
+    // === 3D Background ===
+    const canvas = document.getElementById("bgCanvas");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const particlesCount = 400;
+    const geometry = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particlesCount * 3);
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 100;
+    }
+    geometry.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
+
+    const material = new THREE.PointsMaterial({ size: 0.5, color: 0x00ffff });
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+    camera.position.z = 30;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      particles.rotation.y += 0.002;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>
